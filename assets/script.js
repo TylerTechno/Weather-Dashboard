@@ -238,4 +238,75 @@ function oneCallRequest(lat, lon) {
     let newListItem = $('<li>').addClass('list-group-item list-group-item-action text-center');
     newListItem.text(cityName);
     cityBtnsEl.prepend(newListItem);
+
+
   }
+
+  searchBtnEl.on('click', function(event) {
+    event.preventDefault();
+    let cityInput = cityInputEl.val().trim();
+    if (cityInput) {
+      user.lastCitySearched = cityInput;
+      getCoords(cityInput); 
+  
+    } else {
+      cityInputEl.attr('placeholder', 'Enter a city first!')
+      setTimeout(() => cityInputEl.attr('placeholder', 'Enter City'), 2000);
+    }
+  });
+
+
+
+  function verifyGeolocation() {
+    var myModal = new bootstrap.Modal(document.getElementById('myModal'))
+    myModal.show()
+
+    var allowGeolocationBtn = $('#allow');
+    var myModalEl = $('#myModal')
+    var closeGeolocationBtn = $('#close');
+
+    myModalEl.on('hidden.bs.modal', function (event) {
+        myModal.hide()
+      });
+
+      allowGeolocationBtn.on('click', function (event) {
+        if(!navigator.geolocation) {
+            console.log('Geolocation is not supported by your browser.')
+
+        } else {
+            navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationError);   
+        }
+    });
+
+    closeGeolocationBtn.on('click', function (event) {
+        myModal.hide();
+      })
+    };
+
+    function geolocationSuccess(position) {
+        user.lat = position.coords.latitude;
+        user.lon = position.coords.longitude;
+      
+        $('#modal-txt').text(`Lat: ${user.lat}, Lon: ${user.lon}`)
+      
+        oneCallRequest(user.lat, user.lon);
+      }
+      
+      function geolocationError() {
+        console.log('Unable to retrieve your location');
+        cityContainer.text("Allow Geolocation for your location's current weather.");
+      }
+      
+      var user = load();
+      console.log(user)
+      if (null === user) {
+        user = new User();
+        verifyGeolocation();
+      
+      } else {
+      
+        user.searchedCities.forEach(city => {
+          createCitySearchBtn(city);
+        });
+        getCoords(user.lastCitySearched)
+      }
