@@ -32,4 +32,33 @@ class User {
     return userData;
   }
 
-  
+  class RequestType {
+    constructor(name, urlSegment, params={}) {
+      this.name = name;
+      this.urlSegment = urlSegment;
+      this.params = params;
+      this.requestUrl = "";
+    }
+  }
+
+  const openWeatherApi = {
+    baseUrl: "https://api.openweathermap.org/",
+    createRequestUrl: function(requestTypeObject) {
+        let requestUrl = openWeatherApi.baseUrl;
+        let paramCount = 0;
+        requestUrl += requestTypeObject.urlSegment;
+        for (let [key, value] of Object.entries(requestTypeObject.params)) {
+
+            if (paramCount < 1) {
+              requestUrl += `?${key}=${value}`;
+            } else {
+              requestUrl += `&${key}=${value}`;
+            }
+            paramCount++;
+          }
+
+          requestUrl += `&appid=${apiKey}`
+          requestTypeObject.requestUrl = requestUrl;
+          return requestUrl;
+        }
+    }
