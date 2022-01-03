@@ -1,0 +1,12 @@
+:root {
+    --font-teko: 'Teko', sans-serif;
+    --font-robo: 'Roboto', sans-serif;
+    --bg-default: black;
+    --txt-default: cyan;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
