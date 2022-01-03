@@ -5,3 +5,14 @@ const searchBtnEl = $('#search-btn');
 const cityBtnsEl = $('#city-btns');
 const cityContainer = $('#city-container');
 const forecastContainerEl = $('#forecast-container');
+
+class User {
+    constructor(userName = 'default') {
+      this.name = userName,
+      this.lastCitySearched = "",
+      this.lat = 0,
+      this.lon = 0,
+      this.searchedCities = [],
+      this.isNewUser = true
+    }
+  }
