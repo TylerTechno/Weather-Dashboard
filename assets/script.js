@@ -140,4 +140,102 @@ class ForecastCard {
       }
     }
 
-    
+    function fillCityCurrentContainerInfo(cityData) {
+        cityContainer.empty();
+        let currentCity = new CurrentWeather(cityData, user.lastCitySearched);
+        let cityCard = currentCity.fillCityCurrentContainerInfo()
+        cityContainer.append(cityCard);
+      }
+      
+      function fillForecastContainer(data) {
+        forecastContainerEl.empty();
+        for (day = 0; day < 5; day++) {
+          let forecastCard = new ForecastCard(`day${day}`, data.daily, day);
+          forecastContainerEl.append(forecastCard.createCard());
+        }
+      }
+
+
+      function getCoords(cityName) {
+        let params = {
+          q: cityName,
+          limit: 1
+        } 
+const cityRequest = new RequestType('getCoords', 'geo/1.0/direct', params);
+openWeatherApi.createRequestUrl(cityRequest);
+
+  fetch(cityRequest.requestUrl).then(async (response) => {
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      alert('Error: ' + response.statusText);
+      return response;
+    }
+
+}).then((data) => {
+    console.log('getCoords: ', data);
+    console.log(user)
+
+if (data.length < 1 || null == data || data[0].name == undefined) {
+     console.log('City Not Found');
+     cityInputEl.val("");
+     cityInputEl.attr('placeholder', 'Not a valid city');
+     setTimeout(() => cityInputEl.attr('placeholder', 'Enter City'), 2000);
+     
+   } else {
+     user.lastCitySearched = data[0].name;
+     user.lat = data[0].lat;
+     user.lon = data[0].lon;
+     if (!user.searchedCities.includes(user.lastCitySearched)) {
+       createCitySearchBtn(cityInputEl.val());
+       user.searchedCities.push(user.lastCitySearched)
+     }
+     
+     save(user);
+     cityInputEl.val("");
+     return oneCallRequest(user.lat, user.lon);
+   }
+ }).catch((err) => {
+   console.log(err);
+ });
+}
+
+function oneCallRequest(lat, lon) { 
+    let params = {
+      'lat': lat,
+      'lon': lon,
+      units: 'imperial'
+    } 
+    const cityRequest = new RequestType('oneCall', 'data/2.5/onecall', params);
+    openWeatherApi.createRequestUrl(cityRequest);
+  
+    fetch(cityRequest.requestUrl).then(async function (response) {
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+  
+      } else {
+        alert('Error: ' + response.statusText);
+      }
+      
+    }).then((data) => {
+      console.log('oneCall: data', data)
+      fillCityCurrentContainerInfo(data)
+      fillForecastContainer(data);
+      
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+  cityBtnsEl.on('click', function(event) {
+    event.preventDefault();
+    getCoords($(event.target).text());
+  });
+
+  function createCitySearchBtn(cityName) {
+    let newListItem = $('<li>').addClass('list-group-item list-group-item-action text-center');
+    newListItem.text(cityName);
+    cityBtnsEl.prepend(newListItem);
+  }
