@@ -16,3 +16,20 @@ class User {
       this.isNewUser = true
     }
   }
+
+  function save(user) {
+    // Save User city and saved searched cities to localStorage
+    user.isNewUser = false;
+    console.log(user, ' SAVED')
+    localStorage.setItem('userWeather', JSON.stringify(user));
+  }
+
+  function load() {
+    // Load User city and searched cities from localStorage
+    let userData = JSON.parse(localStorage.getItem('userWeather'));
+    console.log(userData, ' LOADED')
+    
+    return userData;
+  }
+
+  
